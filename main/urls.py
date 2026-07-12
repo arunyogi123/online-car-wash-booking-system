@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -30,6 +30,7 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/account/',include('account.api.v1.urls')),
     # OpenAPI schema
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
 
