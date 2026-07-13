@@ -27,3 +27,5 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ('id', 'full_name', 'address', 'created_at')
         read_only_fields = ('id', 'created_at')
+
+
