@@ -31,6 +31,7 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/account/',include('account.api.v1.urls')),
+    path('api/services/',include('services.api.v1.urls')),
     # OpenAPI schema
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
 
