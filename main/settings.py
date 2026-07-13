@@ -46,7 +46,7 @@ APPS= [
     'payment',
     'booking',
 
-    #3rd part app
+    #3rd party app
     'rest_framework',
     'drf_spectacular',
 
