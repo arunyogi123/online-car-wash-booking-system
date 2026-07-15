@@ -22,14 +22,5 @@ class Services(models.Model):
         return self.service_name
     
 
-class TimeSlot(models.Model):
-    start_time=models.TimeField()
-    end_time=models.TimeField()
-    status = models.CharField(
-        max_length=20,
-        choices=StatusChoices.choices,
-        default=StatusChoices.ACTIVE)
 
-    def __str__(self):
-        return f"{self.start_time} - {self.end_time}"
 

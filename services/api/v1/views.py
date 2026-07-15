@@ -4,8 +4,8 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from services.models import Services, TimeSlot
-from services.api.v1.serializers import ServiceSerializer, TimeSlotSerializer
+from services.models import Services
+from services.api.v1.serializers import ServiceSerializer
 
 
 class ServiceView(GenericAPIView):
@@ -80,3 +80,6 @@ class ServiceManage(GenericAPIView):
             {"message": "Deleted Successfully"}, 
             status=status.HTTP_200_OK
         )
+
+
+
