@@ -6,6 +6,7 @@ from .models import User,Profile
 class UserAdmin(admin.ModelAdmin):
     list_display=("email","username")
     search_fields=['email','phone_no']
+    list_filter = ("is_staff", "is_superuser", "is_active")
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
