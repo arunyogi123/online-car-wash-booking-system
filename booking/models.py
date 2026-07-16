@@ -18,7 +18,8 @@ class Booking(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
 
+    class Meta:
+        unique_together = [("booking_date", "booking_time")]
+
     def __str__(self):
-        return f"{self.customer}-{self.car_model}"
-
-
+        return f"{self.customer.email} - {self.booking_time}"

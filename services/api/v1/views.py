@@ -24,7 +24,7 @@ class ServiceView(GenericAPIView):
         data = Services.objects.all()
         serializer = ServiceSerializer(data, many=True)
         return Response(serializer.data)
-
+    
     @extend_schema(
         request=ServiceSerializer,
         responses=ServiceSerializer,
