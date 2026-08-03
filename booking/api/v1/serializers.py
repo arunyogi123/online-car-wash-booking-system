@@ -18,8 +18,8 @@ class BookingSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
             booking_time = attrs["booking_time"]
 
-            opening_time = time(6, 0)    # 6:00 AM
-            closing_time = time(18, 0)   # 6:00 PM
+            opening_time = time(6, 0)    
+            closing_time = time(18, 0)  
 
             if booking_time < opening_time or booking_time > closing_time:
                 raise serializers.ValidationError(
