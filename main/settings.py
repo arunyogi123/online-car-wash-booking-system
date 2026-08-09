@@ -155,3 +155,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 AUTH_USER_MODEL = "account.User"
+
+
+KHALTI_INIT_URL = "https://dev.khalti.com/api/v2/epayment/initiate/"
+KHALTI_VERIFY_URL = "https://dev.khalti.com/api/v2/epayment/lookup/"
