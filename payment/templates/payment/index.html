@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WashOS - Payment Status</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .icon-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+            font-size: 36px;
+        }
+
+        .icon-success {
+            background: #e6f9f0;
+        }
+
+        .icon-cancelled {
+            background: #fff8e6;
+        }
+
+        .icon-failed {
+            background: #feeaea;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 2rem;
+        }
+
+        .info-row {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .info-value.mono {
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    {% if status == "success" %}
+
+        <div class="icon-circle icon-success">✅</div>
+
+        <h1 style="color: #1a8a56;">
+            Payment successful
+        </h1>
+
+        <p class="subtitle">
+            Your WashOS booking has been successfully paid.
+        </p>
+
+        <div class="info-row">
+            <span class="info-label">Amount</span>
+            <span class="info-value">
+                Rs. {{ amount }}
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Booking ID</span>
+            <span class="info-value">
+                #{{ booking.id }}
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Transaction ID</span>
+            <span class="info-value mono">
+                {{ transaction_id }}
+            </span>
+        </div>
+
+
+    {% elif status == "cancelled" %}
+
+        <div class="icon-circle icon-cancelled">⚠️</div>
+
+        <h1 style="color: #b87d00;">
+            Payment cancelled
+        </h1>
+
+        <p class="subtitle">
+            You cancelled the payment process.
+        </p>
+
+        <div class="info-row">
+            <span class="info-label">Booking ID</span>
+            <span class="info-value">
+                #{{ booking.id }}
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Transaction ID</span>
+            <span class="info-value mono">
+                {{ transaction_id }}
+            </span>
+        </div>
+
+
+    {% else %}
+
+        <div class="icon-circle icon-failed">❌</div>
+
+        <h1 style="color: #c0392b;">
+            Payment failed
+        </h1>
+
+        <p class="subtitle">
+            Something went wrong. Please try again.
+        </p>
+
+        {% if message %}
+        <div class="info-row">
+            <span class="info-label">Reason</span>
+            <span class="info-value">
+                {{ message }}
+            </span>
+        </div>
+        {% endif %}
+
+        <div class="info-row">
+            <span class="info-label">Booking ID</span>
+            <span class="info-value">
+                #{{ booking.id }}
+            </span>
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
