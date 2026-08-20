@@ -3,9 +3,10 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
+
 class User(AbstractUser):
-    email=models.EmailField(unique=True)
-    phone_no=models.CharField(max_length=15,unique=True)
+    email = models.EmailField(unique=True)
+    phone_no = models.CharField(max_length=15, unique=True)
     is_verified = models.BooleanField(default=False)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
