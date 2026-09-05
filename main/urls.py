@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/services/',include('services.api.v1.urls')),
     path('api/booking/',include('booking.api.v1.urls')),
     path('api/payment',include('payment.api.v1.urls')),
+    path("", include("presentation.urls")),
     
     # OpenAPI schema
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
