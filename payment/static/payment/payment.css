@@ -1,0 +1,296 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+
+    background: #f4f6f8;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+
+    padding: 2rem;
+
+    margin: 0;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.card {
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 2.5rem 2rem;
+
+    width: 100%;
+    max-width: 420px;
+
+    text-align: center;
+
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================
+   ICON
+========================= */
+
+.icon-circle {
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 1.25rem;
+
+    font-size: 36px;
+
+    font-weight: bold;
+}
+
+
+/* SUCCESS */
+
+.icon-success {
+    background: #e6f9f0;
+
+    color: #1a8a56;
+}
+
+
+/* CANCELLED */
+
+.icon-cancelled {
+    background: #fff8e6;
+
+    color: #b87d00;
+}
+
+
+/* FAILED */
+
+.icon-failed {
+    background: #feeaea;
+
+    color: #c0392b;
+}
+
+
+/* =========================
+   HEADING
+========================= */
+
+h1 {
+    font-size: 20px;
+
+    font-weight: 600;
+
+    margin-top: 0;
+
+    margin-bottom: 0.25rem;
+}
+
+
+/* SUCCESS */
+
+.success-title {
+    color: #1a8a56;
+}
+
+
+/* CANCELLED */
+
+.cancelled-title {
+    color: #b87d00;
+}
+
+
+/* FAILED */
+
+.failed-title {
+    color: #c0392b;
+}
+
+
+/* =========================
+   SUBTITLE
+========================= */
+
+.subtitle {
+    font-size: 14px;
+
+    color: #888;
+
+    margin-top: 0;
+
+    margin-bottom: 2rem;
+
+    line-height: 1.5;
+}
+
+
+/* =========================
+   INFORMATION ROW
+========================= */
+
+.info-row {
+    background: #f8f9fa;
+
+    border-radius: 10px;
+
+    padding: 0.875rem 1rem;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 1rem;
+
+    margin-bottom: 10px;
+}
+
+.info-label {
+    font-size: 13px;
+
+    color: #888;
+
+    text-align: left;
+}
+
+.info-value {
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #111;
+
+    text-align: right;
+
+    word-break: break-word;
+}
+
+.info-value.mono {
+    font-family: monospace;
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.action-button {
+    width: 100%;
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 13px 20px;
+
+    margin-top: 20px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.action-button:hover {
+    transform: translateY(-1px);
+}
+
+.action-button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================
+   SUCCESS BUTTON
+========================= */
+
+.success-button {
+    background: #1a8a56;
+
+    color: white;
+}
+
+.success-button:hover {
+    background: #147447;
+}
+
+
+/* =========================
+   CANCELLED BUTTON
+========================= */
+
+.cancelled-button {
+    background: #b87d00;
+
+    color: white;
+}
+
+.cancelled-button:hover {
+    background: #956700;
+}
+
+
+/* =========================
+   FAILED BUTTON
+========================= */
+
+.failed-button {
+    background: #c0392b;
+
+    color: white;
+}
+
+.failed-button:hover {
+    background: #a93226;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+    body {
+        padding: 1rem;
+    }
+
+    .card {
+        padding: 2rem 1.25rem;
+    }
+
+    .info-row {
+        padding: 0.75rem;
+    }
+
+    .info-label {
+        font-size: 12px;
+    }
+
+    .info-value {
+        font-size: 13px;
+    }
+}

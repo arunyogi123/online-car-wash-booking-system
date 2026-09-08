@@ -1,483 +1,538 @@
 const API_URL = "/api";
 
 
-// ================= HELPERS =================
+// =====================================================
+// DOM READY
+// =====================================================
 
-function setMessage(el, text, type) {
-    if (!el) return;
+document.addEventListener("DOMContentLoaded", function () {
 
-    el.textContent = text;
-    el.classList.remove("is-success", "is-error");
+    console.log("WashOS app.js loaded");
 
-    if (type === "success") {
-        el.classList.add("is-success");
-    } else if (type === "error") {
-        el.classList.add("is-error");
-    }
-}
+    initializeAccountTabs();
+    initializeNavigation();
+    initializeBooking();
+    initializeLogin();
+    initializeRegistration();
+    initializeLogout();
 
+    setMinimumBookingDate();
 
-function setLoading(button, isLoading, loadingText, defaultText) {
-    if (!button) return;
+    getServices();
 
-    button.disabled = isLoading;
-    button.textContent = isLoading ? loadingText : defaultText;
-}
-
-
-function extractErrorText(data) {
-    if (typeof data === "string") return data;
-
-    if (data && data.message) return data.message;
-    if (data && data.detail) return data.detail;
-    if (data && data.error) return data.error;
-
-    if (data && typeof data === "object") {
-        const parts = [];
-
-        Object.keys(data).forEach(function (key) {
-            const value = data[key];
-
-            if (Array.isArray(value)) {
-                parts.push(value.join(" "));
-            } else if (typeof value === "object") {
-                parts.push(extractErrorText(value));
-            } else {
-                parts.push(value);
-            }
-        });
-
-        if (parts.length) return parts.join(" ");
+    if (getToken()) {
+        getBookings();
     }
 
-    return "Something went wrong. Please try again.";
-}
+});
 
+
+// =====================================================
+// AUTH
+// =====================================================
 
 function getToken() {
     return localStorage.getItem("access_token");
 }
 
 
-// ================= ACCOUNT TABS =================
+function setMessage(element, message, type = "") {
 
-const accountTabs = document.querySelectorAll(".account-tab");
+    if (!element) {
+        return;
+    }
 
-accountTabs.forEach(function (tab) {
+    element.textContent = message;
 
-    tab.addEventListener("click", function () {
+    element.classList.remove(
+        "is-success",
+        "is-error"
+    );
 
-        const targetId = tab.dataset.target;
+    if (type === "success") {
+        element.classList.add("is-success");
+    }
 
-        accountTabs.forEach(function (item) {
-            item.classList.remove("is-active");
-            item.setAttribute("aria-selected", "false");
-        });
-
-        document.querySelectorAll(".account-panel").forEach(function (panel) {
-            panel.classList.remove("is-active");
-        });
-
-        tab.classList.add("is-active");
-        tab.setAttribute("aria-selected", "true");
-
-        const targetPanel = document.getElementById(targetId);
-
-        if (targetPanel) {
-            targetPanel.classList.add("is-active");
-        }
-
-    });
-
-});
-
-
-// ================= REGISTER =================
-
-const registerForm = document.getElementById("registerForm");
-const registerMessage = document.getElementById("registerMessage");
-
-if (registerForm) {
-
-    registerForm.addEventListener("submit", async function (event) {
-
-        event.preventDefault();
-
-        const username =
-            document.getElementById("registerUsername").value;
-
-        const email =
-            document.getElementById("registerEmail").value;
-
-        const phone =
-            document.getElementById("registerPhone").value;
-
-        const password =
-            document.getElementById("registerPassword").value;
-
-        const submitButton =
-            registerForm.querySelector("button[type='submit']");
-
-
-        setMessage(registerMessage, "", null);
-
-        setLoading(
-            submitButton,
-            true,
-            "Creating account...",
-            "Create account"
-        );
-
-
-        try {
-
-            const response = await fetch(
-                `${API_URL}/account/register/`,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        username: username,
-                        email: email,
-                        phone_no: phone,
-                        password: password
-                    })
-                }
-            );
-
-
-            const data = await response.json();
-
-
-            if (response.ok) {
-
-                setMessage(
-                    registerMessage,
-                    data.message || "Account created successfully. Please login.",
-                    "success"
-                );
-
-                registerForm.reset();
-
-            } else {
-
-                setMessage(
-                    registerMessage,
-                    extractErrorText(data),
-                    "error"
-                );
-
-            }
-
-        } catch (error) {
-
-            console.error(error);
-
-            setMessage(
-                registerMessage,
-                "Unable to connect to the server.",
-                "error"
-            );
-
-        } finally {
-
-            setLoading(
-                submitButton,
-                false,
-                "Creating account...",
-                "Create account"
-            );
-
-        }
-
-    });
-
+    if (type === "error") {
+        element.classList.add("is-error");
+    }
 }
 
 
-// ================= LOGIN =================
+// =====================================================
+// ERROR HANDLING
+// =====================================================
 
-const loginForm = document.getElementById("loginForm");
-const loginMessage = document.getElementById("loginMessage");
+function extractErrorText(data) {
 
-if (loginForm) {
+    if (!data) {
+        return "Something went wrong.";
+    }
 
-    loginForm.addEventListener("submit", async function (event) {
+    if (typeof data === "string") {
+        return data;
+    }
 
-        event.preventDefault();
+    if (data.message) {
+        return data.message;
+    }
 
-        const email =
-            document.getElementById("loginEmail").value;
+    if (data.detail) {
+        return data.detail;
+    }
 
-        const password =
-            document.getElementById("loginPassword").value;
+    if (data.error) {
 
-        const submitButton =
-            loginForm.querySelector("button[type='submit']");
+        if (typeof data.error === "string") {
+            return data.error;
+        }
 
+        return extractErrorText(data.error);
+    }
 
-        setMessage(loginMessage, "", null);
+    if (typeof data === "object") {
 
-        setLoading(
-            submitButton,
-            true,
-            "Logging in...",
-            "Log in"
-        );
+        const messages = [];
 
+        Object.keys(data).forEach(function (key) {
 
-        try {
+            const value = data[key];
 
-            const response = await fetch(
-                `${API_URL}/account/login/`,
-                {
-                    method: "POST",
+            if (Array.isArray(value)) {
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
-                }
-            );
-
-
-            const data = await response.json();
-
-
-            if (response.ok) {
-
-                localStorage.setItem(
-                    "access_token",
-                    data.access
+                messages.push(
+                    `${key}: ${value.join(" ")}`
                 );
 
-                localStorage.setItem(
-                    "refresh_token",
-                    data.refresh
+            } else if (
+                value &&
+                typeof value === "object"
+            ) {
+
+                messages.push(
+                    `${key}: ${extractErrorText(value)}`
                 );
-
-
-                setMessage(
-                    loginMessage,
-                    "Logged in successfully. You can now book your wash.",
-                    "success"
-                );
-
-                loginForm.reset();
-
-
-                getServices();
-                getBookings();
 
             } else {
 
-                setMessage(
-                    loginMessage,
-                    extractErrorText(data),
-                    "error"
+                messages.push(
+                    `${key}: ${String(value)}`
                 );
-
             }
 
-        } catch (error) {
+        });
 
-            console.error(error);
-
-            setMessage(
-                loginMessage,
-                "Unable to connect to the server.",
-                "error"
-            );
-
-        } finally {
-
-            setLoading(
-                submitButton,
-                false,
-                "Logging in...",
-                "Log in"
-            );
-
+        if (messages.length > 0) {
+            return messages.join(" ");
         }
+    }
 
-    });
-
+    return "Something went wrong.";
 }
 
 
-// ================= SERVICES =================
+// =====================================================
+// PENDING BOOKING
+// =====================================================
 
-async function getServices() {
+function savePendingBooking(booking) {
 
-    const servicesContainer =
-        document.getElementById("services");
-
-    const serviceSelect =
-        document.getElementById("service");
-
-
-    if (!servicesContainer) return;
+    sessionStorage.setItem(
+        "pending_booking",
+        JSON.stringify(booking)
+    );
+}
 
 
-    servicesContainer.innerHTML = `
-        <p class="services-loading">
-            Loading services...
-        </p>
-    `;
+function getPendingBooking() {
 
+    const data =
+        sessionStorage.getItem(
+            "pending_booking"
+        );
+
+    if (!data) {
+        return null;
+    }
 
     try {
 
-        const response = await fetch(
-            `${API_URL}/services/service/`,
-            {
-                method: "GET"
+        return JSON.parse(data);
+
+    } catch (error) {
+
+        sessionStorage.removeItem(
+            "pending_booking"
+        );
+
+        return null;
+    }
+}
+
+
+function clearPendingBooking() {
+
+    sessionStorage.removeItem(
+        "pending_booking"
+    );
+}
+
+
+// =====================================================
+// ACCOUNT TABS
+// =====================================================
+
+function showAccountPanel(targetId) {
+
+    const tabs =
+        document.querySelectorAll(
+            ".account-tab"
+        );
+
+    const panels =
+        document.querySelectorAll(
+            ".account-panel"
+        );
+
+    tabs.forEach(function (tab) {
+
+        const active =
+            tab.dataset.target === targetId;
+
+        tab.classList.toggle(
+            "is-active",
+            active
+        );
+
+        tab.setAttribute(
+            "aria-selected",
+            active ? "true" : "false"
+        );
+
+    });
+
+    panels.forEach(function (panel) {
+
+        panel.classList.toggle(
+            "is-active",
+            panel.id === targetId
+        );
+
+    });
+}
+
+
+function initializeAccountTabs() {
+
+    const tabs =
+        document.querySelectorAll(
+            ".account-tab"
+        );
+
+    tabs.forEach(function (tab) {
+
+        tab.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const target =
+                    tab.dataset.target;
+
+                console.log(
+                    "Account tab clicked:",
+                    target
+                );
+
+                showAccountPanel(target);
+
             }
         );
 
+    });
 
-        const data = await response.json();
+}
 
+
+function scrollToAccount() {
+
+    const accountSection =
+        document.getElementById(
+            "account-section"
+        );
+
+    if (!accountSection) {
+        return;
+    }
+
+    accountSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+
+function openAccountForBooking() {
+
+    showAccountPanel("login-panel");
+
+    scrollToAccount();
+
+    setMessage(
+        document.getElementById("loginMessage"),
+        "Please log in or create an account to continue your booking.",
+        "error"
+    );
+
+}
+
+
+// =====================================================
+// NAVIGATION
+// =====================================================
+
+function initializeNavigation() {
+
+    const navLogin =
+        document.getElementById(
+            "navLogin"
+        );
+
+    if (!navLogin) {
+        return;
+    }
+
+    navLogin.addEventListener(
+        "click",
+        function () {
+
+            showAccountPanel(
+                "login-panel"
+            );
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// SERVICES
+// =====================================================
+
+async function getServices() {
+
+    const serviceContainer =
+        document.getElementById(
+            "services"
+        );
+
+    const serviceSelect =
+        document.getElementById(
+            "service"
+        );
+
+    if (!serviceContainer) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/services/service/`
+            );
+
+        const data =
+            await response.json();
 
         if (!response.ok) {
-            throw new Error(extractErrorText(data));
+
+            throw new Error(
+                extractErrorText(data)
+            );
         }
 
+        const services =
+            Array.isArray(data)
+                ? data
+                : data.data ||
+                  data.results ||
+                  [];
 
-        servicesContainer.innerHTML = "";
+        /*
+         * If your backend does not return `status`,
+         * the service will also be accepted.
+         */
 
+        const activeServices =
+            services.filter(function (service) {
+
+                return (
+                    service.status === undefined ||
+                    service.status === null ||
+                    service.status === "ACTIVE"
+                );
+
+            });
+
+
+        // =================================================
+        // SERVICE SELECT
+        // =================================================
 
         if (serviceSelect) {
 
-            serviceSelect.innerHTML =
-                `<option value="">Select a service</option>`;
+            serviceSelect.innerHTML = `
+                <option value="">
+                    Choose your wash
+                </option>
+            `;
+
+            activeServices.forEach(
+                function (service) {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value =
+                        service.id;
+
+                    option.textContent =
+                        `${service.name} - Rs. ${service.price}`;
+
+                    serviceSelect.appendChild(
+                        option
+                    );
+
+                }
+            );
 
         }
 
 
-        const activeServices = data.filter(function (service) {
-            return service.status === "ACTIVE";
-        });
+        // =================================================
+        // SERVICE CARDS
+        // =================================================
 
+        serviceContainer.innerHTML = "";
 
         if (activeServices.length === 0) {
 
-            servicesContainer.innerHTML = `
-                <p>No services are currently available.</p>
+            serviceContainer.innerHTML = `
+                <p class="services-loading">
+                    No services available right now.
+                </p>
             `;
 
             return;
         }
 
 
-        activeServices.forEach(function (service, index) {
+        activeServices.forEach(
+            function (service, index) {
 
-            let icon = "icon-droplet";
-            let extraClass = "";
-            let badge = "";
+                const card =
+                    document.createElement(
+                        "article"
+                    );
 
-
-            if (index === 1) {
-                icon = "icon-foam";
-                extraClass = "featured-service";
-                badge = `
-                    <div class="popular-badge">
-                        Most popular
-                    </div>
-                `;
-            }
-
-            if (index === 2) {
-                icon = "icon-shine";
-            }
+                card.className =
+                    "service-card";
 
 
-            servicesContainer.innerHTML += `
+                if (index === 1) {
+                    card.classList.add(
+                        "featured-service"
+                    );
+                }
 
-                <div class="service-card ${extraClass}">
 
-                    ${badge}
+                const popularBadge =
+                    index === 1
+                        ? `<span class="popular-badge">POPULAR</span>`
+                        : "";
+
+
+                card.innerHTML = `
+
+                    ${popularBadge}
 
                     <div class="service-icon">
-
-                        <svg width="26" height="26" aria-hidden="true">
-                            <use href="#${icon}"></use>
+                        <svg
+                            width="22"
+                            height="22"
+                            aria-hidden="true"
+                        >
+                            <use href="#icon-droplet"></use>
                         </svg>
-
                     </div>
 
-
                     <h3>
-                        ${service.service_name}
+                        ${escapeHTML(service.name)}
                     </h3>
 
-
                     <p>
-                        ${service.description || "Professional car wash service."}
+                        ${escapeHTML(
+                            service.description || ""
+                        )}
                     </p>
-
 
                     <div class="service-bottom">
 
                         <div>
 
                             <span>
-                                Price
+                                Starting from
                             </span>
 
                             <strong>
-                                Rs. ${service.price}
+                                Rs. ${escapeHTML(
+                                    String(service.price)
+                                )}
                             </strong>
 
                         </div>
-
 
                         <button
                             type="button"
                             class="service-book-button"
                             data-service-id="${service.id}"
                         >
-                            Book Now
+                            Book now
                         </button>
 
                     </div>
 
-                </div>
-
-            `;
-
-
-            if (serviceSelect) {
-
-                serviceSelect.innerHTML += `
-
-                    <option value="${service.id}">
-                        ${service.service_name} - Rs. ${service.price}
-                    </option>
-
                 `;
 
+
+                serviceContainer.appendChild(
+                    card
+                );
+
             }
+        );
 
-        });
 
+        initializeServiceButtons();
 
-        addServiceBookButtons();
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Service loading error:",
+            error
+        );
 
-        servicesContainer.innerHTML = `
-            <p>${error.message}</p>
+        serviceContainer.innerHTML = `
+            <p class="services-loading">
+                Unable to load services.
+            </p>
         `;
 
     }
@@ -485,70 +540,94 @@ async function getServices() {
 }
 
 
-// ================= SERVICE BOOK NOW =================
+// =====================================================
+// SERVICE BUTTONS
+// =====================================================
 
-function addServiceBookButtons() {
+function initializeServiceButtons() {
 
     const buttons =
-        document.querySelectorAll(".service-book-button");
-
+        document.querySelectorAll(
+            ".service-book-button"
+        );
 
     buttons.forEach(function (button) {
 
-        button.addEventListener("click", function () {
+        button.addEventListener(
+            "click",
+            function () {
 
-            const serviceId =
-                button.dataset.serviceId;
+                const serviceId =
+                    button.dataset.serviceId;
 
-            const serviceSelect =
-                document.getElementById("service");
-
-            const bookingSection =
-                document.getElementById("booking-section");
-
-
-            if (serviceSelect) {
-
-                serviceSelect.value = serviceId;
-
-            }
-
-
-            if (bookingSection) {
-
-                bookingSection.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-
-            }
-
-
-            setTimeout(function () {
+                const serviceSelect =
+                    document.getElementById(
+                        "service"
+                    );
 
                 if (serviceSelect) {
-                    serviceSelect.focus();
+
+                    serviceSelect.value =
+                        serviceId;
+
                 }
 
-            }, 600);
 
-        });
+                const bookingSection =
+                    document.getElementById(
+                        "booking-section"
+                    );
+
+                if (bookingSection) {
+
+                    bookingSection.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+
+                }
+
+            }
+        );
 
     });
 
 }
 
 
-// ================= BOOKING =================
+// =====================================================
+// ESCAPE HTML
+// =====================================================
 
-const bookingForm =
-    document.getElementById("bookingForm");
+function escapeHTML(value) {
 
-const bookingMessage =
-    document.getElementById("bookingMessage");
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        value ?? "";
+
+    return div.innerHTML;
+}
 
 
-if (bookingForm) {
+// =====================================================
+// BOOKING
+// =====================================================
+
+function initializeBooking() {
+
+    const bookingForm =
+        document.getElementById(
+            "bookingForm"
+        );
+
+    if (!bookingForm) {
+        return;
+    }
+
 
     bookingForm.addEventListener(
         "submit",
@@ -556,149 +635,591 @@ if (bookingForm) {
 
             event.preventDefault();
 
-
-            if (!getToken()) {
-
-                setMessage(
-                    bookingMessage,
-                    "Please login before making a booking.",
-                    "error"
+            const bookingMessage =
+                document.getElementById(
+                    "bookingMessage"
                 );
 
-
-                const accountSection =
-                    document.getElementById("account-section");
-
-                if (accountSection) {
-
-                    setTimeout(function () {
-
-                        accountSection.scrollIntoView({
-                            behavior: "smooth"
-                        });
-
-                    }, 500);
-
-                }
-
-                return;
-
-            }
+            const submitButton =
+                document.getElementById(
+                    "bookingSubmitButton"
+                );
 
 
             const service =
-                document.getElementById("service").value;
+                document.getElementById(
+                    "service"
+                ).value;
 
             const carModel =
-                document.getElementById("carModel").value;
+                document.getElementById(
+                    "carModel"
+                ).value.trim();
 
             const carNumberPlate =
-                document.getElementById("carNumberPlate").value;
+                document.getElementById(
+                    "carNumberPlate"
+                ).value.trim();
 
             const bookingDate =
-                document.getElementById("bookingDate").value;
+                document.getElementById(
+                    "bookingDate"
+                ).value;
 
             const bookingTime =
-                document.getElementById("bookingTime").value;
+                document.getElementById(
+                    "bookingTime"
+                ).value;
 
 
-            const submitButton =
-                bookingForm.querySelector(
-                    "button[type='submit']"
+            // =================================================
+            // VALIDATION
+            // =================================================
+
+            if (!service) {
+
+                setMessage(
+                    bookingMessage,
+                    "Please select a service.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (!carModel) {
+
+                setMessage(
+                    bookingMessage,
+                    "Please enter your car model.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (!carNumberPlate) {
+
+                setMessage(
+                    bookingMessage,
+                    "Please enter your number plate.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (!bookingDate) {
+
+                setMessage(
+                    bookingMessage,
+                    "Please select a booking date.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (!bookingTime) {
+
+                setMessage(
+                    bookingMessage,
+                    "Please select a booking time.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            // =================================================
+            // TIME VALIDATION
+            // =================================================
+
+            if (
+                bookingTime < "06:00" ||
+                bookingTime > "18:00"
+            ) {
+
+                setMessage(
+                    bookingMessage,
+                    "Booking time must be between 6:00 AM and 6:00 PM.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            // =================================================
+            // BOOKING DATA
+            // =================================================
+
+            const bookingData = {
+
+                service:
+                    service,
+
+                car_model:
+                    carModel,
+
+                car_number_plate:
+                    carNumberPlate,
+
+                booking_date:
+                    bookingDate,
+
+                booking_time:
+                    bookingTime
+
+            };
+
+
+            const token =
+                getToken();
+
+
+            // =================================================
+            // USER NOT LOGGED IN
+            // =================================================
+
+            if (!token) {
+
+                savePendingBooking(
+                    bookingData
+                );
+
+                openAccountForBooking();
+
+                return;
+            }
+
+
+            // =================================================
+            // USER LOGGED IN
+            // =================================================
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent =
+                    "Processing...";
+            }
+
+            await createBookingAndPay(
+                bookingData,
+                token
+            );
+
+
+            if (submitButton) {
+
+                submitButton.disabled = false;
+
+                submitButton.textContent =
+                    "Book now";
+            }
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// CREATE BOOKING + PAYMENT
+// =====================================================
+
+async function createBookingAndPay(
+    booking,
+    token
+) {
+
+    const bookingMessage =
+        document.getElementById(
+            "bookingMessage"
+        );
+
+    setMessage(
+        bookingMessage,
+        "Creating your booking..."
+    );
+
+
+    try {
+
+        // =================================================
+        // CREATE BOOKING
+        // =================================================
+
+        const bookingResponse =
+            await fetch(
+                `${API_URL}/booking/view/`,
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+
+                    },
+
+                    body: JSON.stringify({
+
+                        service:
+                            Number(
+                                booking.service
+                            ),
+
+                        car_model:
+                            booking.car_model,
+
+                        car_number_plate:
+                            booking.car_number_plate,
+
+                        booking_date:
+                            booking.booking_date,
+
+                        booking_time:
+                            booking.booking_time
+
+                    })
+                }
+            );
+
+
+        const bookingData =
+            await bookingResponse.json();
+
+
+        if (!bookingResponse.ok) {
+
+            setMessage(
+                bookingMessage,
+                extractErrorText(
+                    bookingData
+                ),
+                "error"
+            );
+
+            return;
+        }
+
+
+        // =================================================
+        // GET BOOKING ID
+        // =================================================
+
+        const bookingId =
+            bookingData?.data?.id ||
+            bookingData?.id;
+
+
+        if (!bookingId) {
+
+            console.error(
+                "Booking response:",
+                bookingData
+            );
+
+            setMessage(
+                bookingMessage,
+                "Booking ID was not returned.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        clearPendingBooking();
+
+
+        setMessage(
+            bookingMessage,
+            "Booking created. Redirecting to payment...",
+            "success"
+        );
+
+
+        // =================================================
+        // PAYMENT
+        // =================================================
+
+        const paymentResponse =
+            await fetch(
+                `${API_URL}/payment/${bookingId}/`,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            `Bearer ${token}`
+
+                    }
+                }
+            );
+
+
+        const paymentData =
+            await paymentResponse.json();
+
+
+        if (!paymentResponse.ok) {
+
+            setMessage(
+                bookingMessage,
+                extractErrorText(
+                    paymentData
+                ),
+                "error"
+            );
+
+            return;
+        }
+
+
+        const paymentUrl =
+            paymentData?.payment_url ||
+            paymentData?.data?.payment_url;
+
+
+        if (!paymentUrl) {
+
+            console.error(
+                "Payment response:",
+                paymentData
+            );
+
+            setMessage(
+                bookingMessage,
+                "Payment URL was not returned.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        // =================================================
+        // REDIRECT TO KHALTI
+        // =================================================
+
+        window.location.href =
+            paymentUrl;
+
+
+    } catch (error) {
+
+        console.error(
+            "Booking error:",
+            error
+        );
+
+        setMessage(
+            bookingMessage,
+            "Something went wrong while creating the booking.",
+            "error"
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// LOGIN
+// =====================================================
+
+function initializeLogin() {
+
+    const loginForm =
+        document.getElementById(
+            "loginForm"
+        );
+
+    if (!loginForm) {
+        return;
+    }
+
+
+    loginForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const loginMessage =
+                document.getElementById(
+                    "loginMessage"
                 );
 
 
-            setMessage(bookingMessage, "", null);
+            const email =
+                document.getElementById(
+                    "loginEmail"
+                ).value.trim();
 
 
-            setLoading(
-                submitButton,
-                true,
-                "Booking...",
-                "Book Now"
+            const password =
+                document.getElementById(
+                    "loginPassword"
+                ).value;
+
+
+            if (!email || !password) {
+
+                setMessage(
+                    loginMessage,
+                    "Please enter your email and password.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            setMessage(
+                loginMessage,
+                "Logging in..."
             );
 
 
             try {
 
-                const response = await fetch(
-                    `${API_URL}/booking/view/`,
-                    {
-                        method: "POST",
+                const response =
+                    await fetch(
+                        `${API_URL}/account/login/`,
+                        {
+                            method: "POST",
 
-                        headers: {
-                            "Content-Type": "application/json",
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
 
-                            "Authorization":
-                                `Bearer ${getToken()}`
-                        },
+                            body: JSON.stringify({
 
-                        body: JSON.stringify({
+                                email:
+                                    email,
 
-                            service: Number(service),
+                                password:
+                                    password
 
-                            car_model: carModel,
-
-                            car_number_plate:
-                                carNumberPlate,
-
-                            booking_date:
-                                bookingDate,
-
-                            booking_time:
-                                bookingTime
-
-                        })
-
-                    }
-                );
+                            })
+                        }
+                    );
 
 
                 const data =
                     await response.json();
 
 
-                if (response.ok) {
+                if (!response.ok) {
 
                     setMessage(
-                        bookingMessage,
-                        data.message || "Booking successful!",
-                        "success"
-                    );
-
-
-                    bookingForm.reset();
-
-
-                    getBookings();
-
-                } else {
-
-                    setMessage(
-                        bookingMessage,
+                        loginMessage,
                         extractErrorText(data),
                         "error"
                     );
 
+                    return;
                 }
+
+
+                if (!data.access) {
+
+                    setMessage(
+                        loginMessage,
+                        "Login response did not contain an access token.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                // =================================================
+                // SAVE JWT
+                // =================================================
+
+                localStorage.setItem(
+                    "access_token",
+                    data.access
+                );
+
+
+                if (data.refresh) {
+
+                    localStorage.setItem(
+                        "refresh_token",
+                        data.refresh
+                    );
+
+                }
+
+
+                // =================================================
+                // CHECK PENDING BOOKING
+                // =================================================
+
+                const pendingBooking =
+                    getPendingBooking();
+
+
+                loginForm.reset();
+
+
+                // =================================================
+                // NORMAL LOGIN
+                // =================================================
+
+                if (!pendingBooking) {
+
+                    setMessage(
+                        loginMessage,
+                        "Login successful.",
+                        "success"
+                    );
+
+                    await getBookings();
+
+                    return;
+                }
+
+
+                // =================================================
+                // LOGIN DURING BOOKING
+                // =================================================
+
+                setMessage(
+                    loginMessage,
+                    "Login successful. Continuing your booking...",
+                    "success"
+                );
+
+
+                await createBookingAndPay(
+                    pendingBooking,
+                    data.access
+                );
 
             } catch (error) {
 
-                console.error(error);
-
-                setMessage(
-                    bookingMessage,
-                    "Unable to connect to the server.",
-                    "error"
+                console.error(
+                    "Login error:",
+                    error
                 );
 
-            } finally {
-
-                setLoading(
-                    submitButton,
-                    false,
-                    "Booking...",
-                    "Book Now"
+                setMessage(
+                    loginMessage,
+                    "Unable to login. Please try again.",
+                    "error"
                 );
 
             }
@@ -709,46 +1230,414 @@ if (bookingForm) {
 }
 
 
-// ================= MY BOOKINGS =================
+// =====================================================
+// REGISTER
+// =====================================================
+
+function initializeRegistration() {
+
+    const registerForm =
+        document.getElementById(
+            "registerForm"
+        );
+
+    if (!registerForm) {
+        return;
+    }
+
+
+    registerForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            console.log(
+                "REGISTER BUTTON CLICKED"
+            );
+
+
+            const registerMessage =
+                document.getElementById(
+                    "registerMessage"
+                );
+
+
+            const submitButton =
+                document.getElementById(
+                    "registerSubmitButton"
+                );
+
+
+            // =================================================
+            // VALUES
+            // =================================================
+
+            const fullName =
+                document.getElementById(
+                    "registerFullName"
+                ).value.trim();
+
+
+            const username =
+                document.getElementById(
+                    "registerUsername"
+                ).value.trim();
+
+
+            const email =
+                document.getElementById(
+                    "registerEmail"
+                ).value.trim();
+
+
+            const phone =
+                document.getElementById(
+                    "registerPhone"
+                ).value.trim();
+
+
+            const password =
+                document.getElementById(
+                    "registerPassword"
+                ).value;
+
+
+            // =================================================
+            // VALIDATION
+            // =================================================
+
+            if (
+                !fullName ||
+                !username ||
+                !email ||
+                !phone ||
+                !password
+            ) {
+
+                setMessage(
+                    registerMessage,
+                    "Please fill in all fields.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            if (password.length < 8) {
+
+                setMessage(
+                    registerMessage,
+                    "Password must be at least 8 characters.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            // =================================================
+            // DISABLE BUTTON
+            // =================================================
+
+            if (submitButton) {
+
+                submitButton.disabled = true;
+
+                submitButton.textContent =
+                    "Creating account...";
+
+            }
+
+
+            setMessage(
+                registerMessage,
+                "Creating your account..."
+            );
+
+
+            try {
+
+                // =================================================
+                // REGISTER
+                // =================================================
+
+                const response =
+                    await fetch(
+                        `${API_URL}/account/register/`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                full_name:
+                                    fullName,
+
+                                username:
+                                    username,
+
+                                email:
+                                    email,
+
+                                phone_no:
+                                    phone,
+
+                                password:
+                                    password
+
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Registration response:",
+                    data
+                );
+
+
+                if (!response.ok) {
+
+                    setMessage(
+                        registerMessage,
+                        extractErrorText(data),
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                // =================================================
+                // CHECK PENDING BOOKING
+                // =================================================
+
+                const pendingBooking =
+                    getPendingBooking();
+
+
+                // =================================================
+                // NORMAL REGISTRATION
+                // =================================================
+
+                if (!pendingBooking) {
+
+                    registerForm.reset();
+
+                    showAccountPanel(
+                        "login-panel"
+                    );
+
+                    setMessage(
+                        document.getElementById(
+                            "loginMessage"
+                        ),
+                        "Account created successfully. Please login.",
+                        "success"
+                    );
+
+                    return;
+                }
+
+
+                // =================================================
+                // REGISTER DURING BOOKING
+                // =================================================
+
+                setMessage(
+                    registerMessage,
+                    "Account created. Logging you in..."
+                );
+
+
+                // =================================================
+                // AUTO LOGIN
+                // =================================================
+
+                const loginResponse =
+                    await fetch(
+                        `${API_URL}/account/login/`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                email:
+                                    email,
+
+                                password:
+                                    password
+
+                            })
+                        }
+                    );
+
+
+                const loginData =
+                    await loginResponse.json();
+
+
+                if (!loginResponse.ok) {
+
+                    registerForm.reset();
+
+                    showAccountPanel(
+                        "login-panel"
+                    );
+
+                    setMessage(
+                        document.getElementById(
+                            "loginMessage"
+                        ),
+                        "Account created successfully. Please login to continue your booking.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                if (!loginData.access) {
+
+                    registerForm.reset();
+
+                    showAccountPanel(
+                        "login-panel"
+                    );
+
+                    setMessage(
+                        document.getElementById(
+                            "loginMessage"
+                        ),
+                        "Account created. Please login to continue.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                // =================================================
+                // SAVE JWT
+                // =================================================
+
+                localStorage.setItem(
+                    "access_token",
+                    loginData.access
+                );
+
+
+                if (loginData.refresh) {
+
+                    localStorage.setItem(
+                        "refresh_token",
+                        loginData.refresh
+                    );
+
+                }
+
+
+                registerForm.reset();
+
+
+                // =================================================
+                // CONTINUE BOOKING
+                // =================================================
+
+                await createBookingAndPay(
+                    pendingBooking,
+                    loginData.access
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Registration error:",
+                    error
+                );
+
+                setMessage(
+                    registerMessage,
+                    "Unable to create account. Please try again.",
+                    "error"
+                );
+
+            } finally {
+
+                if (submitButton) {
+
+                    submitButton.disabled = false;
+
+                    submitButton.textContent =
+                        "Create account";
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// GET BOOKINGS
+// =====================================================
 
 async function getBookings() {
 
     const bookingsContainer =
-        document.getElementById("bookings");
+        document.getElementById(
+            "bookings"
+        );
 
 
-    if (!bookingsContainer) return;
-
-
-    if (!getToken()) {
-
-        bookingsContainer.innerHTML = `
-            <p>Please login to view your bookings.</p>
-        `;
-
+    if (!bookingsContainer) {
         return;
-
     }
 
 
-    bookingsContainer.innerHTML = `
-        <p>Loading your bookings...</p>
-    `;
+    const token =
+        getToken();
+
+
+    if (!token) {
+        return;
+    }
 
 
     try {
 
-        const response = await fetch(
-            `${API_URL}/booking/view/`,
-            {
-                headers: {
+        const response =
+            await fetch(
+                `${API_URL}/booking/view/`,
+                {
+                    method: "GET",
 
-                    "Authorization":
-                        `Bearer ${getToken()}`
-
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    }
                 }
-            }
-        );
+            );
 
 
         const data =
@@ -757,116 +1646,150 @@ async function getBookings() {
 
         if (!response.ok) {
 
-            throw new Error(
-                extractErrorText(data)
+            console.error(
+                "Booking fetch error:",
+                data
             );
 
+            return;
         }
+
+
+        const bookings =
+            Array.isArray(data)
+                ? data
+                : data.data ||
+                  data.results ||
+                  [];
 
 
         bookingsContainer.innerHTML = "";
 
 
-        if (data.length === 0) {
+        if (bookings.length === 0) {
 
             bookingsContainer.innerHTML = `
-                <p>No bookings found yet.</p>
+                <p>No bookings found.</p>
             `;
 
             return;
-
         }
 
 
-        data.forEach(function (booking) {
+        bookings.forEach(
+            function (booking) {
 
-            const serviceName =
-                booking.service_name ||
-                `Service #${booking.service}`;
-
-
-            bookingsContainer.innerHTML += `
-
-                <div class="booking-card">
-
-                    <div class="booking-card-top">
-
-                        <div>
-
-                            <span class="booking-id">
-                                Booking #${booking.id}
-                            </span>
-
-                            <h3>
-                                ${serviceName}
-                            </h3>
-
-                        </div>
+                const card =
+                    document.createElement(
+                        "div"
+                    );
 
 
-                        <span class="payment-status">
-                            ${booking.payment_status}
-                        </span>
-
-                    </div>
+                card.className =
+                    "booking-card";
 
 
-                    <div class="booking-details">
+                card.innerHTML = `
 
-                        <p>
-                            <strong>Car:</strong>
-                            ${booking.car_model}
-                        </p>
+                    <h3>
+                        Booking #${booking.id}
+                    </h3>
 
-                        <p>
-                            <strong>Plate:</strong>
-                            ${booking.car_number_plate}
-                        </p>
+                    <p>
+                        Date:
+                        ${escapeHTML(
+                            String(booking.booking_date || "")
+                        )}
+                    </p>
 
-                        <p>
-                            <strong>Date:</strong>
-                            ${booking.booking_date}
-                        </p>
+                    <p>
+                        Time:
+                        ${escapeHTML(
+                            String(booking.booking_time || "")
+                        )}
+                    </p>
 
-                        <p>
-                            <strong>Time:</strong>
-                            ${booking.booking_time}
-                        </p>
+                    <p>
+                        Car:
+                        ${escapeHTML(
+                            String(booking.car_model || "")
+                        )}
+                    </p>
 
-                    </div>
+                    <p>
+                        Number Plate:
+                        ${escapeHTML(
+                            String(
+                                booking.car_number_plate || ""
+                            )
+                        )}
+                    </p>
 
-                </div>
+                    <p>
+                        Payment:
+                        ${escapeHTML(
+                            String(
+                                booking.payment_status || ""
+                            )
+                        )}
+                    </p>
 
-            `;
+                `;
 
-        });
+
+                bookingsContainer.appendChild(
+                    card
+                );
+
+            }
+        );
+
 
     } catch (error) {
 
-        console.error(error);
-
-        bookingsContainer.innerHTML = `
-            <p>${error.message}</p>
-        `;
+        console.error(
+            "Bookings error:",
+            error
+        );
 
     }
 
 }
 
 
-// ================= REFRESH BOOKINGS =================
+// =====================================================
+// LOGOUT
+// =====================================================
 
-const loadBookingsButton =
-    document.getElementById("loadBookingsButton");
+function initializeLogout() {
+
+    const logoutButton =
+        document.getElementById(
+            "logoutButton"
+        );
+
+    if (!logoutButton) {
+        return;
+    }
 
 
-if (loadBookingsButton) {
-
-    loadBookingsButton.addEventListener(
+    logoutButton.addEventListener(
         "click",
         function () {
 
-            getBookings();
+            localStorage.removeItem(
+                "access_token"
+            );
+
+            localStorage.removeItem(
+                "refresh_token"
+            );
+
+            sessionStorage.removeItem(
+                "pending_booking"
+            );
+
+            window.location.reload();
 
         }
     );
@@ -874,28 +1797,47 @@ if (loadBookingsButton) {
 }
 
 
-// ================= DATE RESTRICTION =================
+// =====================================================
+// MINIMUM BOOKING DATE
+// =====================================================
 
-const bookingDateInput =
-    document.getElementById("bookingDate");
+function setMinimumBookingDate() {
+
+    const bookingDateInput =
+        document.getElementById(
+            "bookingDate"
+        );
+
+    if (!bookingDateInput) {
+        return;
+    }
 
 
-if (bookingDateInput) {
+    const now =
+        new Date();
+
+
+    const year =
+        now.getFullYear();
+
+
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(2, "0");
+
+
+    const day =
+        String(
+            now.getDate()
+        ).padStart(2, "0");
+
 
     const today =
-        new Date().toISOString().split("T")[0];
-
-    bookingDateInput.min = today;
-
-}
+        `${year}-${month}-${day}`;
 
 
-// ================= AUTO LOAD =================
-
-getServices();
-
-if (getToken()) {
-
-    getBookings();
+    bookingDateInput.min =
+        today;
 
 }
