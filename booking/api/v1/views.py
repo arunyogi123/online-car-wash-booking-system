@@ -10,30 +10,26 @@ from booking.api.v1.serializers import BookingSerializer
 class BookingView(GenericAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        data = Booking.objects.filter(customer=request.user)
-        serializer = BookingSerializer(data, many=True)
+        bookings = Booking.objects.filter(customer=request.user)
+        serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)
 
     def post(self, request):
         serializer = BookingSerializer(data=request.data)
 
-        if serializer.is_valid():
-            serializer.save(customer=request.user)  # Add customer automatically
+        serializer.is_valid(raise_exception=True)
 
-            return Response(
-                {
-                    "message": "Booked Successfully",
-                    "data": serializer.data
-                },
-                status=status.HTTP_201_CREATED
-            )
+        booking = serializer.save(customer=request.user)
 
         return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
+            {
+                "message": "Booked Successfully",
+                "data": BookingSerializer(booking).data,
+            },
+            status=status.HTTP_201_CREATED,
         )
 
 class BookingManage(GenericAPIView):
