@@ -6,6 +6,7 @@ class PaymentStatus(models.TextChoices):
     PENDING="PENDING"
     SUCCESS="SUCCESS"
     FAILURE="FAILURE"
+    CANCELLED = "CANCELLED"
 
 class Booking(models.Model):
     customer=models.ForeignKey(User,on_delete=models.CASCADE)

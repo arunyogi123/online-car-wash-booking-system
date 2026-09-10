@@ -402,8 +402,9 @@ async function getServices() {
                     option.value =
                         service.id;
 
+                    // FIXED: service.service_name
                     option.textContent =
-                        `${service.name} - Rs. ${service.price}`;
+                        `${service.service_name} - Rs. ${service.price}`;
 
                     serviceSelect.appendChild(
                         option
@@ -473,7 +474,9 @@ async function getServices() {
                     </div>
 
                     <h3>
-                        ${escapeHTML(service.name)}
+                        ${escapeHTML(
+                            service.service_name
+                        )}
                     </h3>
 
                     <p>
@@ -800,7 +803,9 @@ function initializeBooking() {
             // =================================================
 
             if (submitButton) {
+
                 submitButton.disabled = true;
+
                 submitButton.textContent =
                     "Processing...";
             }
