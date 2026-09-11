@@ -3,8 +3,10 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from django.utils import timezone
 from booking.models import Booking
-from booking.api.v1.serializers import BookingSerializer
+from booking.api.v1.serializers import BookedSlotSerializer, BookingSerializer
 
 
 class BookingView(GenericAPIView):
@@ -66,6 +68,16 @@ class BookingManage(GenericAPIView):
         return Response({"message":"Booking deleted successfully"},status=status.HTTP_200_OK)
 
 
+class BookedSlotsView(GenericAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookedSlotSerializer
+    permission_classes = [AllowAny]
 
+    def get(self, request):
+        bookings = Booking.objects.filter(
+            booking_date__gte=timezone.now().date()
+        )
+        serializer = BookedSlotSerializer(bookings, many=True)
+        return Response(serializer.data)
     
 
