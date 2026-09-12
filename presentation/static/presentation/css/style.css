@@ -194,6 +194,45 @@ ol, ul {
     margin-bottom: 15px;
 }
 
+.service-features {
+    list-style: none;
+    margin: 0 0 18px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.service-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: #333333;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background-color 0.15s;
+}
+
+.service-features li:hover {
+    background-color: #f2f9fb;
+}
+
+.service-features li::before {
+    content: "✓";
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #e6f2f8;
+    color: #0077b6;
+    font-size: 11px;
+    font-weight: bold;
+}
+
 .service-bottom {
     margin-top: auto;
     padding-top: 15px;
@@ -285,6 +324,78 @@ ol, ul {
     border: 1px solid #cccccc;
     border-radius: 4px;
     font-size: 14px;
+}
+
+
+/* ================= BOOKING CALENDAR ================= */
+
+.calendar {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+}
+
+.calendar-loading {
+    text-align: center;
+    color: #555555;
+}
+
+.calendar-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.slot-marquee {
+    overflow: hidden;
+    width: 100%;
+}
+
+.slot-track {
+    display: flex;
+    gap: 10px;
+    width: max-content;
+    animation: slideLeftToRight 18s linear infinite;
+}
+
+.slot-marquee:hover .slot-track {
+    animation-play-state: paused;
+}
+
+@keyframes slideLeftToRight {
+    from {
+        transform: translateX(-50%);
+    }
+    to {
+        transform: translateX(0%);
+    }
+}
+
+.slot-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background-color: #ffd6d6;
+    color: #990000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.slot-date {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.slot-time {
+    font-size: 13px;
+    margin-top: 3px;
 }
 
 

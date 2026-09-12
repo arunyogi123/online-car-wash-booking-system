@@ -7,11 +7,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import extend_schema
 from .serializers import UserSerializer,ProfileSerializer,LoginSerializer
+
+#Assigns the currently active user model
 User = get_user_model()
 
 class RegisterView(APIView):
     @extend_schema(
-        request=UserSerializer,
+        request=
+
+        UserSerializer,
         responses=UserSerializer,
         tags=["Authentication"]
     )
