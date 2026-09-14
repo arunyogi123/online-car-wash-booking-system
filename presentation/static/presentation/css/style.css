@@ -469,6 +469,36 @@ ol, ul {
     margin-top: 10px;
 }
 
+/* ================= MY BOOKINGS ================= */
+
+#bookingList {
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+
+.booking-card {
+border: 1px solid #cccccc;
+border-radius: 6px;
+padding: 20px;
+background-color: #ffffff;
+}
+
+.booking-card h3 {
+margin-bottom: 12px;
+color: #0077b6;
+}
+
+.booking-card p {
+margin-bottom: 6px;
+font-size: 14px;
+color: #555555;
+}
+
+.booking-card strong {
+color: #222222;
+}
+
 
 /* ================= FOOTER ================= */
 

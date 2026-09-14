@@ -1,14 +1,19 @@
 {% load static %}
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WashOS - Online Car Wash Booking</title>
 
-    <link rel="stylesheet" href="{% static 'presentation/css/style.css' %}">
+```
+<title>WashOS - Online Car Wash Booking</title>
+
+<link rel="stylesheet" href="{% static 'presentation/css/style.css' %}">
+```
+
 </head>
 
 <body>
@@ -20,20 +25,24 @@
 <header class="navbar">
     <div class="nav-container">
 
-        <a href="#home" class="logo">WashOS</a>
+```
+    <a href="#home" class="logo">WashOS</a>
 
-        <nav class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#services-section">Services</a>
-            <a href="#how-it-works">How it works</a>
-        </nav>
+    <nav class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#services-section">Services</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#my-bookings-section">My Bookings</a>
+    </nav>
 
-        <div class="nav-actions">
-            <a href="#account-section" id="navLogin">Log in</a>
-            <a href="#booking-section" class="nav-button">Book now</a>
-        </div>
-
+    <div class="nav-actions">
+        <a href="#account-section" id="navLogin">Log in</a>
+        <a href="#booking-section" class="nav-button">Book now</a>
     </div>
+
+</div>
+```
+
 </header>
 
 <main>
@@ -43,10 +52,21 @@
 ===================================================== -->
 
 <section id="home" class="hero">
-    <h1>Book Your Car Wash Online</h1>
-    <p>Choose a service, pick a time, and book your car wash in a few clicks.</p>
-    <a href="#services-section" class="btn">Choose a Service</a>
-    <p class="hours-text">Open daily, 6:00 AM to 6:00 PM</p>
+
+```
+<h1>Book Your Car Wash Online</h1>
+
+<p>
+    Choose a service, pick a time, and book your car wash in a few clicks.
+</p>
+
+<a href="#services-section" class="btn">Choose a Service</a>
+
+<p class="hours-text">
+    Open daily, 6:00 AM to 6:00 PM
+</p>
+```
+
 </section>
 
 <!-- =====================================================
@@ -55,12 +75,19 @@
 
 <section id="services-section" class="section">
 
-    <h2>Our Services</h2>
-    <p>Pick the wash package that fits your car.</p>
+```
+<h2>Our Services</h2>
 
-    <div class="service-container" id="services">
-        <p class="services-loading">Loading services...</p>
-    </div>
+<p>Pick the wash package that fits your car.</p>
+
+<div class="service-container" id="services">
+
+    <p class="services-loading">
+        Loading services...
+    </p>
+
+</div>
+```
 
 </section>
 
@@ -70,35 +97,64 @@
 
 <section id="how-it-works" class="section">
 
-    <h2>How It Works</h2>
+```
+<h2>How It Works</h2>
 
-    <ol class="steps">
+<ol class="steps">
 
-        <li class="step">
-            <span class="step-number">1</span>
-            <h3>Choose a service</h3>
-            <p>Pick Basic, Premium, or Standard.</p>
-        </li>
+    <li class="step">
 
-        <li class="step">
-            <span class="step-number">2</span>
-            <h3>Enter car details</h3>
-            <p>Add your car model and number plate.</p>
-        </li>
+        <span class="step-number">1</span>
 
-        <li class="step">
-            <span class="step-number">3</span>
-            <h3>Pick a time</h3>
-            <p>Choose a date and time between 6 AM and 6 PM.</p>
-        </li>
+        <h3>Choose a service</h3>
 
-        <li class="step">
-            <span class="step-number">4</span>
-            <h3>Confirm booking</h3>
-            <p>Reserve your slot and drive in.</p>
-        </li>
+        <p>
+            Pick Basic, Premium, or Standard.
+        </p>
 
-    </ol>
+    </li>
+
+
+    <li class="step">
+
+        <span class="step-number">2</span>
+
+        <h3>Enter car details</h3>
+
+        <p>
+            Add your car model and number plate.
+        </p>
+
+    </li>
+
+
+    <li class="step">
+
+        <span class="step-number">3</span>
+
+        <h3>Pick a time</h3>
+
+        <p>
+            Choose a date and time between 6 AM and 6 PM.
+        </p>
+
+    </li>
+
+
+    <li class="step">
+
+        <span class="step-number">4</span>
+
+        <h3>Confirm booking</h3>
+
+        <p>
+            Reserve your slot and drive in.
+        </p>
+
+    </li>
+
+</ol>
+```
 
 </section>
 
@@ -108,39 +164,134 @@
 
 <section id="booking-section" class="section">
 
-    <h2>Book a Wash</h2>
-    <p>Fill in the form below to reserve your slot.</p>
+```
+<h2>Book a Wash</h2>
 
-    <div id="bookingCalendar" class="calendar">
-        <p class="calendar-loading">Loading calendar...</p>
-    </div>
+<p>
+    Fill in the form below to reserve your slot.
+</p>
 
-    <form id="bookingForm" class="form-box" novalidate>
 
-        <label for="service">Select service</label>
-        <select id="service" required>
-            <option value="">Choose your wash</option>
-        </select>
+<div id="bookingCalendar" class="calendar">
 
-        <label for="carModel">Car model</label>
-        <input type="text" id="carModel" placeholder="Hyundai i20" required>
+    <p class="calendar-loading">
+        Loading calendar...
+    </p>
 
-        <label for="carNumberPlate">Number plate</label>
-        <input type="text" id="carNumberPlate" placeholder="BA 2 PA 1234" required>
+</div>
 
-        <label for="bookingDate">Select date</label>
-        <input type="date" id="bookingDate" required>
 
-        <label for="bookingTime">Select time</label>
-        <input type="time" id="bookingTime" min="06:00" max="18:00" required>
+<form id="bookingForm" class="form-box" novalidate>
 
-        <p class="hours-text">Available daily from 6:00 AM to 6:00 PM</p>
+    <label for="service">
+        Select service
+    </label>
 
-        <button type="submit" class="btn" id="bookingSubmitButton">Book now</button>
+    <select id="service" required>
 
-    </form>
+        <option value="">
+            Choose your wash
+        </option>
 
-    <p id="bookingMessage" class="message" role="status" aria-live="polite"></p>
+    </select>
+
+
+    <label for="carModel">
+        Car model
+    </label>
+
+    <input
+        type="text"
+        id="carModel"
+        placeholder="Hyundai i20"
+        required
+    >
+
+
+    <label for="carNumberPlate">
+        Number plate
+    </label>
+
+    <input
+        type="text"
+        id="carNumberPlate"
+        placeholder="BA 2 PA 1234"
+        required
+    >
+
+
+    <label for="bookingDate">
+        Select date
+    </label>
+
+    <input
+        type="date"
+        id="bookingDate"
+        required
+    >
+
+
+    <label for="bookingTime">
+        Select time
+    </label>
+
+    <input
+        type="time"
+        id="bookingTime"
+        min="06:00"
+        max="18:00"
+        required
+    >
+
+
+    <p class="hours-text">
+        Available daily from 6:00 AM to 6:00 PM
+    </p>
+
+
+    <button
+        type="submit"
+        class="btn"
+        id="bookingSubmitButton"
+    >
+        Book now
+    </button>
+
+</form>
+
+
+<p
+    id="bookingMessage"
+    class="message"
+    role="status"
+    aria-live="polite"
+></p>
+```
+
+</section>
+
+<!-- =====================================================
+     MY BOOKINGS / VIEW BOOKING SECTION
+===================================================== -->
+
+<section id="my-bookings-section" class="section">
+
+```
+<h2>My Bookings</h2>
+
+<p>
+    View your car wash bookings.
+</p>
+
+
+<div id="bookingList">
+
+    <p>
+        Please log in to view your bookings.
+    </p>
+
+</div>
+```
 
 </section>
 
@@ -150,67 +301,196 @@
 
 <section id="account-section" class="section">
 
-    <h2>Log In or Create an Account</h2>
+```
+<h2>
+    Log In or Create an Account
+</h2>
 
-    <div class="account-box">
 
-        <div class="account-tabs">
-            <button type="button" class="account-tab is-active" data-target="login-panel">Log in</button>
-            <button type="button" class="account-tab" data-target="register-panel">Create account</button>
-        </div>
+<div class="account-box">
 
-        <!-- LOGIN PANEL -->
-        <div class="account-panel is-active" id="login-panel">
 
-            <p>Log in to book a service.</p>
+    <div class="account-tabs">
 
-            <form id="loginForm" novalidate>
+        <button
+            type="button"
+            class="account-tab is-active"
+            data-target="login-panel"
+        >
+            Log in
+        </button>
 
-                <label for="loginEmail">Email address</label>
-                <input type="email" id="loginEmail" placeholder="you@example.com" required>
 
-                <label for="loginPassword">Password</label>
-                <input type="password" id="loginPassword" placeholder="Your password" required>
-
-                <button type="submit" class="btn">Log in</button>
-
-            </form>
-
-            <p id="loginMessage" class="message" role="status" aria-live="polite"></p>
-
-        </div>
-
-        <!-- REGISTER PANEL -->
-        <div class="account-panel" id="register-panel">
-
-            <p>Create an account to start booking car washes.</p>
-
-            <form id="registerForm" novalidate>
-
-                <label for="registerFullName">Full name</label>
-                <input type="text" id="registerFullName" placeholder="Arun Yogi" required>
-
-                <label for="registerUsername">Username</label>
-                <input type="text" id="registerUsername" placeholder="Choose a username" required>
-
-                <label for="registerEmail">Email address</label>
-                <input type="email" id="registerEmail" placeholder="you@example.com" required>
-
-                <label for="registerPhone">Phone number</label>
-                <input type="tel" id="registerPhone" placeholder="98XXXXXXXX" required>
-
-                <label for="registerPassword">Password</label>
-                <input type="password" id="registerPassword" placeholder="At least 8 characters" required>
-
-                <button type="submit" class="btn" id="registerSubmitButton">Create account</button>
-
-            </form>
-
-            <p id="registerMessage" class="message" role="status" aria-live="polite"></p>
-
-        </div>
+        <button
+            type="button"
+            class="account-tab"
+            data-target="register-panel"
+        >
+            Create account
+        </button>
 
     </div>
+
+
+    <!-- =================================================
+         LOGIN PANEL
+    ================================================== -->
+
+    <div
+        class="account-panel is-active"
+        id="login-panel"
+    >
+
+        <p>
+            Log in to book a service.
+        </p>
+
+
+        <form id="loginForm" novalidate>
+
+            <label for="loginEmail">
+                Email address
+            </label>
+
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="you@example.com"
+                required
+            >
+
+
+            <label for="loginPassword">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Your password"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="btn"
+            >
+                Log in
+            </button>
+
+        </form>
+
+
+        <p
+            id="loginMessage"
+            class="message"
+            role="status"
+            aria-live="polite"
+        ></p>
+
+    </div>
+
+
+    <!-- =================================================
+         REGISTER PANEL
+    ================================================== -->
+
+    <div
+        class="account-panel"
+        id="register-panel"
+    >
+
+        <p>
+            Create an account to start booking car washes.
+        </p>
+
+
+        <form id="registerForm" novalidate>
+
+
+            <label for="registerFullName">
+                Full name
+            </label>
+
+            <input
+                type="text"
+                id="registerFullName"
+                placeholder="Arun Yogi"
+                required
+            >
+
+
+            <label for="registerUsername">
+                Username
+            </label>
+
+            <input
+                type="text"
+                id="registerUsername"
+                placeholder="Choose a username"
+                required
+            >
+
+
+            <label for="registerEmail">
+                Email address
+            </label>
+
+            <input
+                type="email"
+                id="registerEmail"
+                placeholder="you@example.com"
+                required
+            >
+
+
+            <label for="registerPhone">
+                Phone number
+            </label>
+
+            <input
+                type="tel"
+                id="registerPhone"
+                placeholder="98XXXXXXXX"
+                required
+            >
+
+
+            <label for="registerPassword">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="registerPassword"
+                placeholder="At least 8 characters"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="btn"
+                id="registerSubmitButton"
+            >
+                Create account
+            </button>
+
+        </form>
+
+
+        <p
+            id="registerMessage"
+            class="message"
+            role="status"
+            aria-live="polite"
+        ></p>
+
+    </div>
+
+</div>
+```
 
 </section>
 
@@ -221,11 +501,21 @@
 ===================================================== -->
 
 <footer>
-    <p>WashOS - Book, wash, done.</p>
-    <p>&copy; 2026 WashOS. All rights reserved.</p>
+
+```
+<p>
+    WashOS - Book, wash, done.
+</p>
+
+<p>
+    &copy; 2026 WashOS. All rights reserved.
+</p>
+```
+
 </footer>
 
 <script src="{% static 'presentation/js/app.js' %}"></script>
 
 </body>
+
 </html>
