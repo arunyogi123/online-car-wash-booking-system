@@ -51,6 +51,7 @@ class BookingSerializer(serializers.ModelSerializer):
 
         return attrs
 
+
 class BookedSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
