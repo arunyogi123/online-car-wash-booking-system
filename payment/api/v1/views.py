@@ -16,19 +16,24 @@ def get_payment_url_by_id(request, id):
         id=id,
         customer=request.user
     )
-
+    #if booking is already paid raise error
     if booking.payment_status == "SUCCESS":
         return Response(
             {"message": "Booking already paid."},
             status=status.HTTP_400_BAD_REQUEST
         )
-
+    #call khalti to start a payment 
     data = KhaltiPay.get_initial_id(
         order_id=booking.id,
+        #readable name (eg:Boking 42)
         order_name=f"BOOKING-{booking.id}",
+        #amount must be in paisa
         amount=int(booking.service.price * 100),
+        #customer name 
         name=booking.customer.username,
+        #cuatomer phone no
         phone=booking.customer.phone_no,
+        #which service being booked
         service=booking.service,
     )
 
@@ -41,12 +46,16 @@ def get_payment_url_by_id(request, id):
 
 @extend_schema(tags=["Payment"])
 @api_view(["GET"])
+
+#khalti redirects
 def payment_callback(request):
-
+    #khalti payment id (like. a bill)
     pidx = request.GET.get("pidx")
+    #booking id we sent to khalti
     booking_id = request.GET.get("purchase_order_id")
+    #Khalti's raw status string (e.g., "User canceled", "Completed").
     payment_status = request.GET.get("status")
-
+    #fetch the booking status from db so we can update 
     booking = Booking.objects.get(id=booking_id)
 
     # User cancelled payment

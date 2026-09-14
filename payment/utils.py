@@ -79,21 +79,25 @@ class KhaltiPay:
     @staticmethod
     #This method is used to verify the payment made by the user. 
     def verify_payment(pidx):
-
+        #khalti checks the payment status using the unique payment ID (pidx) that was returned by the Khalti API during the payment initiation process.
         url = "https://dev.khalti.com/api/v2/epayment/lookup/"
 
         payload = {
+            #payment ID khalti gave us ,to verify payment status
             "pidx": pidx
         }
 
         headers = {
+            #so our secret key so khalti can verify us 
             "Authorization": f"Key {KHALTI_SECRET_KEY}",
             "Content-Type": "application/json",
         }
 
+
         response = requests.post(
             url,
             headers=headers,
+            #send the payload to khalti in json format
             data=json.dumps(payload),
         )
 
