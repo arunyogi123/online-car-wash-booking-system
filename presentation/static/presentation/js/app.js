@@ -56,6 +56,41 @@ async function loadBookedSlots() {
 }
 
 
+// ---------- GROUP BOOKED SLOTS BY SERVICE ----------
+
+function groupBookedSlotsByService(slots) {
+    const groups = {};
+
+    slots.forEach(function (slot) {
+        const name = slot.service_name || "Other";
+
+        if (!groups[name]) {
+            groups[name] = [];
+        }
+
+        groups[name].push(slot);
+    });
+
+    // preferred display order, with anything else sorted after
+    const preferredOrder = ["Basic", "Standard", "Premium"];
+
+    const orderedNames = Object.keys(groups).sort(function (a, b) {
+        const ai = preferredOrder.indexOf(a);
+        const bi = preferredOrder.indexOf(b);
+
+        if (ai === -1 && bi === -1) return a.localeCompare(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+
+        return ai - bi;
+    });
+
+    return orderedNames.map(function (name) {
+        return { name: name, slots: groups[name] };
+    });
+}
+
+
 // ---------- DISPLAY BOOKED SLOTS ----------
 
 function renderBookedSlots() {
@@ -73,8 +108,13 @@ function renderBookedSlots() {
         return;
     }
 
-    const sortedSlots =
-        bookedSlots.slice().sort(function (a, b) {
+    const groups = groupBookedSlotsByService(bookedSlots);
+
+    let html = "";
+
+    groups.forEach(function (group) {
+
+        const sortedSlots = group.slots.slice().sort(function (a, b) {
 
             if (a.booking_date === b.booking_date) {
                 return a.booking_time.localeCompare(
@@ -87,38 +127,41 @@ function renderBookedSlots() {
             );
         });
 
+        let boxesHTML = "";
 
-    let boxesHTML = "";
+        sortedSlots.forEach(function (slot) {
 
-    sortedSlots.forEach(function (slot) {
+            const niceDate =
+                formatDate(slot.booking_date);
 
-        const niceDate =
-            formatDate(slot.booking_date);
+            const niceTime =
+                slot.booking_time.slice(0, 5);
 
-        const niceTime =
-            slot.booking_time.slice(0, 5);
+            boxesHTML +=
+                '<div class="slot-box">' +
+                    '<span class="slot-date">' +
+                        niceDate +
+                    '</span>' +
 
-        boxesHTML +=
-            '<div class="slot-box">' +
-                '<span class="slot-date">' +
-                    niceDate +
-                '</span>' +
+                    '<span class="slot-time">' +
+                        niceTime +
+                    '</span>' +
+                '</div>';
+        });
 
-                '<span class="slot-time">' +
-                    niceTime +
-                '</span>' +
+        html +=
+            '<div class="slot-group">' +
+                '<p class="calendar-header">' +
+                    escapeHTML(group.name) +
+                '</p>' +
+
+                '<div class="slot-marquee">' +
+                    '<div class="slot-track">' +
+                        boxesHTML + boxesHTML +
+                    '</div>' +
+                '</div>' +
             '</div>';
     });
-
-
-    let html =
-        '<p class="calendar-header">Already booked slots</p>';
-
-    html += '<div class="slot-marquee">';
-    html += '<div class="slot-track">';
-    html += boxesHTML + boxesHTML;
-    html += '</div>';
-    html += '</div>';
 
     calendarBox.innerHTML = html;
 }
