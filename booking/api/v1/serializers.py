@@ -53,6 +53,8 @@ class BookingSerializer(serializers.ModelSerializer):
 
 
 class BookedSlotSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(source="service.service_name", read_only=True)
+
     class Meta:
         model = Booking
-        fields = ["booking_date", "booking_time"]
+        fields = ["booking_date", "booking_time", "service_name"]
